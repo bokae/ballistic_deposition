@@ -221,7 +221,7 @@ def create_envelope(x,y,n,r=1,L=100,sampling_factor=100):
     """
     
     from scipy.stats import binned_statistic
-    from numpy import linspace,pi,sin,cos,floor
+    from numpy import linspace,pi,sin,cos,floor,isnan
     
     sample_x=[]
     sample_y=[]
@@ -240,4 +240,46 @@ def create_envelope(x,y,n,r=1,L=100,sampling_factor=100):
     ymax,be,bn=binned_statistic(sample_x,sample_y,statistic="max",bins=floor(5*float(L)/r))
     
     # return envelope x,y, all sampled x,y - that was for debugging purposes
+    ymax[isnan(ymax)]=0
+    return be[1:],ymax
+
+def create_envelope_selected(x,y,nlist,r=1,L=100,sampling_factor=100):
+    """
+    Function for calculating the surface of the deposit.
+    Deposit coordinates are given by x and y.
+    It is possible to only use the first n fallen particles.
+    
+    The function samples points from the boundaries of the particles,
+    then sampled points are binned according to x, and the maximum y
+    is taken in each bin.
+    
+    Inputs:
+        - x and y coordinates of deposited particles
+        - n number of particles to use from x and y
+        - r radius of deposited particle
+        - L length of substrate
+        - sampling factor: how many points to take from the particle boundaries
+    """
+    
+    from scipy.stats import binned_statistic
+    from numpy import linspace,pi,sin,cos,floor,isnan
+    
+    sample_x=[]
+    sample_y=[]
+    
+    # one small sampled circle
+    t=linspace(0,2*pi,sampling_factor)
+    tx=r*sin(t)
+    ty=r*cos(t)
+    
+    # adding sampled circle to all particle coordinates
+    for i in nlist:
+        sample_x+=list(x[i]+tx)
+        sample_y+=list(y[i]+ty)
+        
+    # binning by x, taking maximum by y
+    ymax,be,bn=binned_statistic(sample_x,sample_y,statistic="max",bins=floor(5*float(L)/r))
+    
+    # return envelope x,y, all sampled x,y - that was for debugging purposes
+    ymax[isnan(ymax)]=0
     return be[1:],ymax
