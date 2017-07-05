@@ -237,7 +237,7 @@ def create_envelope(x,y,n,r=1,L=100,sampling_factor=100):
         sample_y+=list(y[i]+ty)
         
     # binning by x, taking maximum by y
-    ymax,be,bn=binned_statistic(sample_x,sample_y,statistic="max",bins=floor(5*float(L)/r))
+    ymax,be,bn=binned_statistic(sample_x,sample_y,statistic=max,bins=floor(5*float(L)/r),range=(0,L))
     
     # return envelope x,y, all sampled x,y - that was for debugging purposes
     ymax[isnan(ymax)]=0
@@ -247,15 +247,15 @@ def create_envelope_selected(x,y,nlist,r=1,L=100,sampling_factor=100):
     """
     Function for calculating the surface of the deposit.
     Deposit coordinates are given by x and y.
-    It is possible to only use the first n fallen particles.
+    This function only uses the particles given in nlist.
     
-    The function samples points from the boundaries of the particles,
+    The function samples points from the boundaries of the given particles,
     then sampled points are binned according to x, and the maximum y
     is taken in each bin.
     
     Inputs:
         - x and y coordinates of deposited particles
-        - n number of particles to use from x and y
+        - nlist indices of particles to use from x and y
         - r radius of deposited particle
         - L length of substrate
         - sampling factor: how many points to take from the particle boundaries
@@ -278,7 +278,7 @@ def create_envelope_selected(x,y,nlist,r=1,L=100,sampling_factor=100):
         sample_y+=list(y[i]+ty)
         
     # binning by x, taking maximum by y
-    ymax,be,bn=binned_statistic(sample_x,sample_y,statistic="max",bins=floor(5*float(L)/r))
+    ymax,be,bn=binned_statistic(array(sample_x),array(sample_y),statistic=max,bins=floor(5*float(L)/r),range=(0,L))
     
     # return envelope x,y, all sampled x,y - that was for debugging purposes
     ymax[isnan(ymax)]=0
